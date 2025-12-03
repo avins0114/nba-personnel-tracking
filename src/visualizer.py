@@ -181,7 +181,7 @@ class GameVisualizer:
                         hull_points = points[hull.vertices]
                         self._hull_patch.set_xy(hull_points)
                     except Exception:
-                        self._hull_patch.set_xy([])
+                        self._hull_patch.set_xy(np.empty((0, 2)))
                 
                 # Update spacing score
                 attacking_left = off_team_id == home_id  # Simplified assumption
@@ -191,7 +191,7 @@ class GameVisualizer:
                 spacing_str = f"Spacing: {score:.1f} | Hull: {hull_area:.0f} sq ft"
                 self._spacing_text.set_text(spacing_str)
             else:
-                self._hull_patch.set_xy([])
+                self._hull_patch.set_xy(np.empty((0, 2)))
                 self._spacing_text.set_text('')
         
         return (self._player_circles + self._player_labels + 
