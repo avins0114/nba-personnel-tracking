@@ -1,0 +1,334 @@
+#!/usr/bin/env python3
+"""
+NBA Tracking Tool - Interactive Launcher
+
+Quick commands:
+  ./nba play <game.json> <event>       - View a specific play
+  ./nba video <video.mp4>              - Track from video
+  ./nba compare <game.json> <video>    - Compare modes
+  ./nba                                - Interactive menu
+"""
+
+import sys
+import os
+from pathlib import Path
+
+# Add src to path
+sys.path.insert(0, str(Path(__file__).parent))
+
+
+def interactive_menu():
+    """Show interactive menu in a loop."""
+    try:
+        while True:
+            print("\n" + "="*60)
+            print("  NBA Player Tracking & Spacing Analysis")
+            print("="*60)
+            print("\nChoose a mode:\n")
+            print("  1. View SportVU data (ground truth)")
+            print("  2. Track from video (computer vision)")
+            print("  3. Compare CV vs SportVU")
+            print("  4. Export metrics to CSV")
+            print("  5. Help / Documentation")
+            print("  6. Exit")
+            print("\n💡 Tip: Close visualization windows to return here")
+            print()
+
+            choice = input("Enter choice (1-6): ").strip()
+
+            if choice == "1":
+                run_sportvu_mode()
+            elif choice == "2":
+                run_cv_mode()
+            elif choice == "3":
+                run_compare_mode()
+            elif choice == "4":
+                run_export_mode()
+            elif choice == "5":
+                show_help()
+            elif choice == "6":
+                print("\n✨ Thanks for using NBA Tracking! See you on the court! 🏀\n")
+                sys.exit(0)
+            else:
+                print("\n❌ Invalid choice. Please enter a number 1-6.")
+    except KeyboardInterrupt:
+        print("\n\n✨ Thanks for using NBA Tracking! See you on the court! 🏀\n")
+        sys.exit(0)
+
+
+def run_sportvu_mode():
+    """Run SportVU visualization mode."""
+    print("\n--- SportVU Mode ---")
+
+    # List available game files
+    data_dir = Path("data/games")
+    data_root = Path("data")
+
+    # Look for game files (.json, .7z, .zip)
+    game_files = []
+    for pattern in ['*.json', '*.7z', '*.zip']:
+        if data_dir.exists():
+            game_files.extend(data_dir.glob(pattern))
+        if data_root.exists():
+            game_files.extend(data_root.glob(pattern))
+
+    # Remove duplicates
+    game_files = list(set(game_files))
+
+    if game_files:
+        print("\nAvailable games:")
+        for i, game in enumerate(sorted(game_files), 1):
+            print(f"  {i}. {game.name}")
+
+        game_file = ""
+        while not game_file:
+            game_choice = input("\nEnter game number (or path): ").strip()
+            if not game_choice:
+                print("❌ Game file is required. Please enter a number or file path.")
+                continue
+            if game_choice.isdigit() and 1 <= int(game_choice) <= len(game_files):
+                game_file = str(sorted(game_files)[int(game_choice) - 1])
+            else:
+                game_file = game_choice
+    else:
+        game_file = ""
+        while not game_file:
+            game_file = input("\nEnter game file path: ").strip()
+            if not game_file:
+                print("❌ Game file is required. Please enter a file path.")
+
+    event = input("Event number (default 0): ").strip() or "0"
+    spacing = input("Show spacing overlay? (y/n, default y): ").strip().lower() != 'n'
+
+    # Build command (with venv activation)
+    cmd = f"python main.py --game {game_file} --event {event}"
+    if spacing:
+        cmd += " --show-spacing"
+
+    print(f"\nRunning: {cmd}\n")
+    # Activate venv and run
+    os.system(f"source venv/bin/activate && {cmd}")
+    input("\n✅ Done! Press ENTER to return to menu...")
+
+
+def run_cv_mode():
+    """Run computer vision mode."""
+    print("\n--- Computer Vision Mode ---")
+
+    # List available videos
+    video_dir = Path("data/videos")
+    if video_dir.exists():
+        videos = list(video_dir.glob("*.mp4")) + list(video_dir.glob("*.mov"))
+        if videos:
+            print("\nAvailable videos:")
+            for i, video in enumerate(videos, 1):
+                print(f"  {i}. {video.name}")
+
+            video_file = ""
+            while not video_file:
+                video_choice = input("\nEnter video number (or path): ").strip()
+                if not video_choice:
+                    print("❌ Video file is required. Please enter a number or file path.")
+                    continue
+                if video_choice.isdigit() and 1 <= int(video_choice) <= len(videos):
+                    video_file = str(videos[int(video_choice) - 1])
+                else:
+                    video_file = video_choice
+        else:
+            video_file = ""
+            while not video_file:
+                video_file = input("\nEnter video file path: ").strip()
+                if not video_file:
+                    print("❌ Video file is required. Please enter a file path.")
+    else:
+        video_file = ""
+        while not video_file:
+            video_file = input("\nEnter video file path: ").strip()
+            if not video_file:
+                print("❌ Video file is required. Please enter a file path.")
+
+    print("\nOptions:")
+    manual = input("  Manual player selection? (y/n, default n): ").strip().lower() == 'y'
+    half_court = input("  Half court view? (y/n, default y): ").strip().lower() != 'n'
+    show_video = input("  Show video alongside court? (y/n, default y): ").strip().lower() != 'n'
+    spacing = input("  Show spacing metrics? (y/n, default y): ").strip().lower() != 'n'
+
+    max_frames = input("  Max frames to process (blank for all): ").strip()
+
+    # Build command
+    cmd = f"python main.py --video {video_file}"
+    if manual:
+        cmd += " --manual-select"
+    if half_court:
+        cmd += " --half-court"
+    if show_video:
+        cmd += " --show-video"
+    if spacing:
+        cmd += " --show-spacing"
+    if max_frames:
+        cmd += f" --max-frames {max_frames}"
+
+    print(f"\nRunning: {cmd}\n")
+    os.system(f"source venv/bin/activate && {cmd}")
+    input("\n✅ Done! Press ENTER to return to menu...")
+
+
+def run_compare_mode():
+    """Run comparison mode."""
+    print("\n--- Comparison Mode ---")
+
+    game_file = ""
+    while not game_file:
+        game_file = input("SportVU game file: ").strip()
+        if not game_file:
+            print("❌ Game file is required. Please enter a file path.")
+
+    video_file = ""
+    while not video_file:
+        video_file = input("Video file: ").strip()
+        if not video_file:
+            print("❌ Video file is required. Please enter a file path.")
+
+    event = input("Event number (default 0): ").strip() or "0"
+
+    cmd = f"python main.py --game {game_file} --video {video_file} --compare --event {event}"
+
+    print(f"\nRunning: {cmd}\n")
+    os.system(f"source venv/bin/activate && {cmd}")
+    input("\n✅ Done! Press ENTER to return to menu...")
+
+
+def run_export_mode():
+    """Run export metrics mode."""
+    print("\n--- Export Metrics ---")
+
+    # List available game files
+    data_dir = Path("data/games")
+    data_root = Path("data")
+
+    # Look for game files (.json, .7z, .zip)
+    game_files = []
+    for pattern in ['*.json', '*.7z', '*.zip']:
+        if data_dir.exists():
+            game_files.extend(data_dir.glob(pattern))
+        if data_root.exists():
+            game_files.extend(data_root.glob(pattern))
+
+    # Remove duplicates
+    game_files = list(set(game_files))
+
+    if game_files:
+        print("\nAvailable games:")
+        for i, game in enumerate(sorted(game_files), 1):
+            print(f"  {i}. {game.name}")
+
+        game_file = ""
+        while not game_file:
+            game_choice = input("\nEnter game number (or path): ").strip()
+            if not game_choice:
+                print("❌ Game file is required. Please enter a number or file path.")
+                continue
+            if game_choice.isdigit() and 1 <= int(game_choice) <= len(game_files):
+                game_file = str(sorted(game_files)[int(game_choice) - 1])
+            else:
+                game_file = game_choice
+    else:
+        game_file = ""
+        while not game_file:
+            game_file = input("\nEnter game file path: ").strip()
+            if not game_file:
+                print("❌ Game file is required. Please enter a file path.")
+
+    output = input("\nOutput CSV file (default metrics.csv): ").strip() or "metrics.csv"
+
+    cmd = f"python main.py --game {game_file} --export-metrics --output {output}"
+
+    print(f"\nRunning: {cmd}\n")
+    os.system(f"source venv/bin/activate && {cmd}")
+    input("\n✅ Done! Press ENTER to return to menu...")
+
+
+def show_help():
+    """Show help documentation."""
+    print("\n" + "="*60)
+    print("  NBA Player Tracking - Quick Reference")
+    print("="*60)
+
+    print("\n--- Quick Commands ---")
+    print("  ./nba play <game.json> <event>    - View a specific play")
+    print("  ./nba video <video.mp4>           - Track from video")
+    print("  ./nba compare <game> <video>      - Compare modes")
+
+    print("\n--- Full Command Examples ---")
+    print("  # SportVU with spacing overlay")
+    print("  python main.py --game data.json --event 50 --show-spacing")
+    print()
+    print("  # CV tracking with manual selection")
+    print("  python main.py --video game.mp4 --manual-select --half-court")
+    print()
+    print("  # Export all metrics")
+    print("  python main.py --game data.json --export-metrics")
+
+    print("\n--- All Available Flags ---")
+    print("  --game FILE          SportVU JSON file")
+    print("  --video FILE         Video file for CV tracking")
+    print("  --event NUM          Event/play number")
+    print("  --manual-select      Manually select players")
+    print("  --half-court         Half court view (for broadcasts)")
+    print("  --show-video         Side-by-side video display")
+    print("  --show-spacing       Show spacing overlay")
+    print("  --calibrate          Calibrate court coordinates")
+    print("  --max-frames NUM     Limit frames processed")
+    print("  --compare            Compare CV vs SportVU")
+    print("  --export-metrics     Export to CSV")
+    print()
+
+    input("\nPress ENTER to return to menu...")
+
+
+def quick_command():
+    """Handle quick commands."""
+    if len(sys.argv) < 2:
+        interactive_menu()
+        return
+
+    cmd = sys.argv[1].lower()
+
+    if cmd == "play":
+        # ./nba play <game.json> <event>
+        if len(sys.argv) < 3:
+            print("Usage: ./nba play <game.json> [event]")
+            sys.exit(1)
+        game = sys.argv[2]
+        event = sys.argv[3] if len(sys.argv) > 3 else "0"
+        os.system(f"source venv/bin/activate && python main.py --game {game} --event {event} --show-spacing")
+
+    elif cmd == "video":
+        # ./nba video <video.mp4>
+        if len(sys.argv) < 3:
+            print("Usage: ./nba video <video.mp4>")
+            sys.exit(1)
+        video = sys.argv[2]
+        os.system(f"source venv/bin/activate && python main.py --video {video} --half-court --show-video --show-spacing")
+
+    elif cmd == "compare":
+        # ./nba compare <game.json> <video.mp4>
+        if len(sys.argv) < 4:
+            print("Usage: ./nba compare <game.json> <video.mp4>")
+            sys.exit(1)
+        game = sys.argv[2]
+        video = sys.argv[3]
+        os.system(f"source venv/bin/activate && python main.py --game {game} --video {video} --compare")
+
+    elif cmd == "help" or cmd == "-h" or cmd == "--help":
+        show_help()
+        sys.exit(0)
+
+    else:
+        print(f"Unknown command: {cmd}")
+        print("Try: ./nba help")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    quick_command()

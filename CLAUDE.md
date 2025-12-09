@@ -1,10 +1,16 @@
 # NBA Player Spacing Analysis - Claude Code Instructions
 
 ## Project Overview
-This project analyzes NBA player spacing and "gravity" metrics using SportVU tracking data. It builds on the visualization approach from linouk23/NBA-Player-Movements but adds advanced spacing analytics.
+This project analyzes NBA player spacing and "gravity" metrics using **two data sources**:
+1. **SportVU tracking data** (2015-16 season) - ground-truth coordinates at 25 FPS
+2. **Computer Vision** (NEW!) - extract tracking from video footage using YOLO + DeepSORT
 
-## Data Source
-We use pre-extracted SportVU tracking data (2015-16 season) rather than computer vision from broadcast footage. This gives us ground-truth x,y coordinates at 25 FPS for all 10 players + ball.
+This builds on the visualization approach from linouk23/NBA-Player-Movements but adds advanced spacing analytics and CV tracking capabilities.
+
+## Data Sources
+
+### Option 1: SportVU Data (Recommended for Accuracy)
+Pre-extracted SportVU tracking data gives ground-truth x,y coordinates at 25 FPS for all 10 players + ball.
 
 **Data format** (JSON):
 - `events[]` - list of plays/possessions
@@ -12,10 +18,21 @@ We use pre-extracted SportVU tracking data (2015-16 season) rather than computer
 - Each moment: `[team_id, player_id, x, y, radius]` for 10 players + ball
 - Court dimensions: 94 x 50 feet (half court: 47 x 50)
 
+### Option 2: Computer Vision Tracking (NEW!)
+Extract tracking data from video footage using deep learning:
+- **Detection**: YOLOv8 for player detection
+- **Tracking**: DeepSORT for consistent player IDs across frames
+- **Mapping**: Homography for pixel → court coordinate transformation
+- **Accuracy**: ±1-2 feet position error (vs ±0.1 feet for SportVU)
+
+See **CV_README.md** for detailed CV usage guide.
+
 ## Project Structure
 ```
 nba-spacing-analysis/
 ├── CLAUDE.md           # This file - project instructions
+├── CV_README.md        # Computer vision usage guide
+├── test_cv.py          # Test CV dependencies
 ├── src/
 │   ├── data_loader.py  # Load/parse SportVU JSON
 │   ├── court.py        # Court drawing utilities
@@ -25,9 +42,16 @@ nba-spacing-analysis/
 │   ├── event.py        # Full possession/play
 │   ├── metrics.py      # Spacing/gravity calculations
 │   ├── visualizer.py   # Matplotlib animations
-│   └── main.py         # CLI entry point
+│   ├── main.py         # CLI entry point (supports both SportVU and CV)
+│   └── cv/             # Computer vision modules
+│       ├── video_loader.py      # Video I/O
+│       ├── player_detector.py   # YOLO detection
+│       ├── player_tracker.py    # DeepSORT tracking
+│       ├── court_detector.py    # Homography calibration
+│       └── cv_data_adapter.py   # CV → SportVU format converter
 ├── data/
-│   └── games/          # SportVU JSON files go here
+│   ├── games/          # SportVU JSON files go here
+│   └── videos/         # Video files for CV tracking
 ├── output/             # Generated visualizations
 └── requirements.txt
 ```
@@ -81,14 +105,16 @@ nba-spacing-analysis/
 
 ## Key Libraries
 ```
-numpy
-pandas
-matplotlib
-scipy (for convex hull, spatial operations)
-argparse
+# Core analytics
+numpy, pandas, matplotlib, scipy
+
+# Computer vision (optional, for video tracking)
+opencv-python, torch, ultralytics, deep-sort-realtime
 ```
 
 ## Running the Project
+
+### SportVU Mode (Ground Truth Data)
 ```bash
 # Basic visualization of a play
 python src/main.py --game data/games/sample.json --event 50
@@ -99,6 +125,23 @@ python src/main.py --game data/games/sample.json --event 50 --show-spacing
 # Export metrics to CSV
 python src/main.py --game data/games/sample.json --export-metrics
 ```
+
+### Computer Vision Mode (Video Input)
+```bash
+# Test CV dependencies
+python test_cv.py
+
+# Process video with CV tracking
+python src/main.py --video data/videos/game.mp4 --max-frames 250
+
+# With court calibration (for accurate coordinates)
+python src/main.py --video data/videos/game.mp4 --calibrate --show-spacing
+
+# Compare CV tracking vs SportVU ground truth
+python src/main.py --game data.json --video game.mp4 --compare --event 50
+```
+
+See **CV_README.md** for detailed CV usage instructions.
 
 ## Code Style
 - Use type hints

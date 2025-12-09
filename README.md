@@ -14,6 +14,21 @@ It's like having a basketball PhD in your terminal.
 
 ## Quick Start
 
+### 🚀 Super Easy Mode (NEW!)
+
+Just run the interactive launcher:
+```bash
+./nba
+```
+
+Pick what you want to do from the menu - no commands to remember!
+
+**Quick commands:**
+```bash
+./nba play data/01.01.2016.CHA.at.TOR.7z 10    # View a play
+./nba video garland_fadeaway3.mp4              # Track from video
+```
+
 ### 1. Set Up Your Environment
 
 ```bash
@@ -30,29 +45,33 @@ pip install -r requirements.txt
 
 ### 2. Get Some Data
 
-You'll need SportVU tracking data (JSON files). We've included sample data in `data/`, or grab more from:
+You'll need SportVU tracking data. We've included sample data in `data/`, or grab more from:
 - https://github.com/linouk23/NBA-Player-Movements
 - https://github.com/sealneaward/nba-movement-data
 
-Extract any `.7z` files:
-```bash
-7z x data/01.01.2016.CHA.at.TOR.7z -o data/
-```
+**Supported formats:**
+- ✅ `.json` - Direct JSON files
+- ✅ `.zip` - Automatically extracted
+- ✅ `.7z` - Automatically extracted (no manual extraction needed!)
 
 ### 3. Start Analyzing
 
+**Easy way:**
 ```bash
-# See what's in a game file
-python -m src.main --game data/0021500492.json --info
+./nba                                           # Interactive menu
+./nba play data/01.01.2016.CHA.at.TOR.7z 10   # Quick command
+```
 
-# Watch a possession with spacing visualization
-python -m src.main --game data/0021500492.json --event 50 --show-spacing
+**Classic way:**
+```bash
+# Works with .json, .zip, or .7z files
+python main.py --game data/01.01.2016.CHA.at.TOR.7z --event 10 --show-spacing
 
-# Check out a single frame
-python -m src.main --game data/0021500492.json --event 50 --frame 100 --show-spacing
+# Export ALL the metrics to CSV
+python main.py --game data/game.json --export-metrics -o my_analysis.csv
 
-# Export ALL the metrics to CSV for data science stuff
-python -m src.main --game data/0021500492.json --export-metrics -o my_analysis.csv
+# Track from video (experimental)
+python main.py --video game.mp4 --half-court --show-video --show-spacing
 ```
 
 ## Commands Explained

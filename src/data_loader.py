@@ -1,5 +1,8 @@
 """Data loader for SportVU JSON files."""
 import json
+import zipfile
+import tempfile
+import shutil
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 
@@ -34,20 +37,75 @@ class SportVULoader:
     
     def __init__(self, filepath: str):
         """Initialize loader with path to JSON file.
-        
+
         Args:
-            filepath: Path to SportVU JSON file
+            filepath: Path to SportVU JSON file (can be .json, .zip, or .7z)
         """
         self.filepath = Path(filepath)
         self._data: Optional[Dict] = None
         self._events: Optional[List[Event]] = None
-        
+        self._temp_dir: Optional[Path] = None
+
     def load(self) -> Dict[str, Any]:
         """Load and cache the JSON data."""
         if self._data is None:
-            with open(self.filepath, 'r') as f:
+            # Check if file is compressed
+            if self.filepath.suffix.lower() in ['.7z', '.zip']:
+                json_path = self._extract_compressed_file()
+            else:
+                json_path = self.filepath
+
+            with open(json_path, 'r', encoding='utf-8') as f:
                 self._data = json.load(f)
         return self._data
+
+    def _extract_compressed_file(self) -> Path:
+        """Extract compressed file and return path to JSON."""
+        print(f"Extracting {self.filepath.suffix} archive...")
+
+        # Create temp directory
+        self._temp_dir = Path(tempfile.mkdtemp(prefix='nba_sportvu_'))
+
+        if self.filepath.suffix.lower() == '.zip':
+            # Handle ZIP files
+            with zipfile.ZipFile(self.filepath, 'r') as zip_ref:
+                zip_ref.extractall(self._temp_dir)
+
+        elif self.filepath.suffix.lower() == '.7z':
+            # Handle 7z files using command line (more reliable than py7zr)
+            import subprocess
+            try:
+                # Try using 7z command (install with: brew install p7zip)
+                subprocess.run(['7z', 'x', str(self.filepath), f'-o{self._temp_dir}', '-y'],
+                             check=True, capture_output=True)
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                # Fallback: try py7zr if available
+                try:
+                    import py7zr
+                    with py7zr.SevenZipFile(self.filepath, mode='r') as z:
+                        z.extractall(path=self._temp_dir)
+                except ImportError:
+                    raise RuntimeError(
+                        "Cannot extract .7z file. Please either:\n"
+                        "  1. Install p7zip: brew install p7zip\n"
+                        "  2. Install py7zr: pip install py7zr\n"
+                        "  3. Extract the file manually and use the .json file"
+                    )
+
+        # Find the JSON file in extracted contents
+        json_files = list(self._temp_dir.glob('*.json'))
+        if not json_files:
+            raise FileNotFoundError(f"No JSON file found in {self.filepath}")
+
+        if len(json_files) > 1:
+            print(f"Found {len(json_files)} JSON files, using: {json_files[0].name}")
+
+        return json_files[0]
+
+    def __del__(self):
+        """Cleanup temp directory on deletion."""
+        if self._temp_dir and self._temp_dir.exists():
+            shutil.rmtree(self._temp_dir, ignore_errors=True)
     
     @property
     def game_id(self) -> str:
