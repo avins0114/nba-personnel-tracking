@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Spacing Analyzer</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="logo">🏀 NBA Spacing Analyzer</h1>
+                <p class="tagline">Quantifying the art of spacing in basketball</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h2>Game Selection</h2>
+                    <select id="gameSelect" class="select-input">
+                        <option value="">Loading games...</option>
+                    </select>
+                </div>
+
+                <div class="sidebar-section">
+                    <h2>Event Selection</h2>
+                    <div class="event-controls">
+                        <input type="number" id="eventInput" class="number-input" placeholder="Event #" min="0">
+                        <button id="loadEventBtn" class="btn btn-primary">Load Event</button>
+                    </div>
+                    <div id="eventInfo" class="event-info"></div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h2>Controls</h2>
+                    <div class="control-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="showSpacing" checked>
+                            <span>Show Spacing Overlay</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="showVideo">
+                            <span>Show Video</span>
+                        </label>
+                    </div>
+                    <div class="playback-controls">
+                        <button id="playPauseBtn" class="btn btn-secondary">Play</button>
+                        <input type="range" id="speedSlider" min="0.5" max="2" step="0.1" value="1" class="slider">
+                        <span id="speedValue">1.0x</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h2>Metrics</h2>
+                    <div id="metricsDisplay" class="metrics-display">
+                        <div class="metric-item">
+                            <span class="metric-label">Spacing Score</span>
+                            <span class="metric-value" id="spacingScore">--</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Hull Area</span>
+                            <span class="metric-value" id="hullArea">--</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Avg Distance</span>
+                            <span class="metric-value" id="avgDistance">--</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Defender Distance</span>
+                            <span class="metric-value" id="defenderDist">--</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Visualization Area -->
+            <div class="visualization-area">
+                <div class="canvas-container">
+                    <canvas id="courtCanvas"></canvas>
+                    <div class="canvas-overlay">
+                        <div class="clock-display" id="clockDisplay">Q1 | 12:00 | Shot: 24.0</div>
+                        <div class="spacing-display" id="spacingDisplay">Spacing: --</div>
+                    </div>
+                </div>
+
+                <div id="videoContainer" class="video-container hidden">
+                    <video id="demoVideo" controls>
+                        <source src="/static/video/avinash_akshay_566_final.mov" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+        </main>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay hidden">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
+
