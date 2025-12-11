@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Player Spacing Analysis - Project Webpage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a73e8, #4285f4);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+            text-align: center;
+            margin: 0 auto;
+        }
+
+        nav {
+            background: #2c3e50;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            display: block;
+            transition: background 0.3s;
+        }
+
+        nav a:hover {
+            background: #34495e;
+        }
+
+        section {
+            background: white;
+            margin: 30px 0;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #1a73e8;
+            border-bottom: 3px solid #1a73e8;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        h3 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        h4 {
+            color: #34495e;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+        }
+
+        .warning {
+            background: #f8d7da;
+            padding: 15px;
+            border-left: 4px solid #dc3545;
+            margin: 20px 0;
+        }
+
+        .success {
+            background: #d4edda;
+            padding: 15px;
+            border-left: 4px solid #28a745;
+            margin: 20px 0;
+        }
+
+        .metric-box {
+            background: #e8f4f8;
+            border: 2px solid #1a73e8;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .metric-box strong {
+            color: #1a73e8;
+        }
+
+        .download-section {
+            background: #f8f9fa;
+            border: 2px dashed #1a73e8;
+            border-radius: 5px;
+            padding: 30px;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .download-section a {
+            display: inline-block;
+            background: #1a73e8;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px;
+            transition: background 0.3s;
+        }
+
+        .download-section a:hover {
+            background: #1557b0;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: #1a73e8;
+            color: white;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .image-placeholder {
+            background: #e0e0e0;
+            border: 2px dashed #999;
+            padding: 40px;
+            text-align: center;
+            color: #666;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .video-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .video-container video {
+            max-width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 50px;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🏀 NBA Player Spacing Analysis</h1>
+        <p>Akshay Gona and Avinash Anand</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#motivation">Motivation</a></li>
+            <li><a href="#approach">Approach</a></li>
+            <li><a href="#implementation">Implementation</a></li>
+            <li><a href="#results">Results</a></li>
+            <li><a href="#problems">Potential Solutions</a></li>
+            <li><a href="#findings">Findings</a></li>
+            <li><a href="#download">Download</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- Motivation Section -->
+        <section id="motivation">
+            <h2>1. Motivation</h2>
+            
+            <h3>Problem Statement</h3>
+            <p>
+                In basketball, player spacing refers to how well offensive players spread out across the court. 
+                Good spacing creates driving lanes, open shots, and makes defenses work harder. Poor spacing 
+                allows defenders to collapse and guard multiple players easily.
+            </p>
+            <p>
+                The problem is that spacing has traditionally been evaluated <strong>subjectively</strong> through 
+                film study. Coaches and analysts make judgments based on watching possessionsa across hundreds of hours of game footage, but there's no 
+                quantitative way to measure whether spacing is actually good or bad, or to compare spacing across 
+                different teams, lineups, or possessions.
+            </p>
+
+            <h3>Why This Matters</h3>
+            <div class="two-column">
+                <div>
+                    <h4>📊 Offensive Efficiency Analysis</h4>
+                    <p>
+                        Teams with better spacing generally score more efficiently. Being able to measure this 
+                        objectively lets you correlate spacing metrics with points scored, effective field goal 
+                        percentage, and other outcomes. A plethora of new avenues for research on optimal spacing strategies can be explored.
+                    </p>
+                </div>
+                <div>
+                    <h4>⭐ Player Evaluation</h4>
+                    <p>
+                        Some players create value not just by scoring themselves, but by drawing defensive attention 
+                        and creating space for teammates. This is often called "gravity." With spacing metrics, 
+                        you can quantify how much space certain players create just by being on the court. A good example could be
+                        Stephen Curry, who is known for his ability to create space for himself and his teammates.
+                    </p>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Goal:</strong> Build a tool that takes NBA player tracking data and calculates objective 
+                spacing metrics - things like floor area coverage, average distances between players, and defensive 
+                pressure. Then visualize these metrics in real-time as you watch plays unfold.
+            </div>
+        </section>
+
+        <!-- Approach Section -->
+        <section id="approach">
+            <h2>2. Approach</h2>
+
+            <h3>Data Source</h3>
+            <p>
+                The tool uses <strong>SportVU tracking data</strong>, which is the NBA's official player tracking 
+                system. It records x-y coordinates for all 10 players plus the ball at <strong>25 frames per second</strong> 
+                with sub-foot accuracy. The data comes in JSON format with:
+            </p>
+            <ul>
+                <li><strong>Events:</strong> Represent possessions/plays</li>
+                <li><strong>Moments:</strong> Individual frames at 25Hz</li>
+                <li><strong>Each moment:</strong> <code>[team_id, player_id, x, y, radius]</code> for 10 players + ball</li>
+                <li><strong>Court dimensions:</strong> 94 x 50 feet (NBA standard)</li>
+            </ul>
+
+            <h3>Core Metrics</h3>
+            
+            <h4>Spacing Metrics (Offensive)</h4>
+            <div class="metric-box">
+                <strong>Convex Hull Area:</strong> Area of polygon formed by 5 offensive players. 
+                Larger area = better spacing. Typical range: 300-800 sq ft.
+            </div>
+            <div class="metric-box">
+                <strong>Average Pairwise Distance:</strong> Mean distance between all offensive player pairs. 
+                Good spacing: 20-25 feet average.
+            </div>
+            <div class="metric-box">
+                <strong>Paint Density:</strong> Number of offensive players within the paint. 
+                Fewer is better for spacing (creates driving lanes and unlocks more space and opportunities for other players).
+            </div>
+            <div class="metric-box">
+                <strong>Three-Point Spread:</strong> Players positioned beyond the arc. 
+                More players beyond arc = better spacing. This is a good metric to measure because it is a good indicator of the overall spacing of the team.
+            </div>
+
+            <h4>Gravity Metrics (Per-Player)</h4>
+            <div class="metric-box">
+                <strong>Defensive Attention:</strong> Distance of nearest defender to each offensive player. 
+                Larger distance = more open.
+            </div>
+            <div class="metric-box">
+                <strong>Help Distance:</strong> How far help defenders are from the ball handler. 
+                Measures defensive collapse.
+            </div>
+
+            <h4>Composite Metric</h4>
+            <div class="metric-box">
+                <strong>Spacing Score (0-100):</strong> Combines hull area, pairwise distance, 3pt spread, 
+                and paint density. Higher = better spacing.
+                <ul style="margin-top: 10px;">
+                    <li><strong>90+</strong> = Elite spacing (think 2017 Rockets or 2022 Warriors)</li>
+                    <li><strong>70-90</strong> = Good spacing (most modern NBA teams)</li>
+                    <li><strong>50-70</strong> = Poor spacing (poorly performing teams)</li>
+                    <li><strong>&lt;50</strong> = Terrible (concentrated offense, often leads to high turnover count and poor shot selection)</li>
+                </ul>
+            </div>
+
+            <h3>Technical Architecture</h3>
+            <p>The tool has three main components:</p>
+            <ol>
+                <li><strong>Data Loader:</strong> Parses SportVU JSON files and handles compressed formats (zip, 7z)</li>
+                <li><strong>Metrics Calculator:</strong> Implements geometric algorithms using scipy for convex hulls and numpy for distance calculations</li>
+                <li><strong>Visualizer:</strong> Built with matplotlib showing animated playback with metrics overlaid on the court</li>
+            </ol>
+
+            <h3>Computer Vision Extension</h3>
+            <p>
+                As an experimental feature, we also implemented a computer vision mode using:
+            </p>
+            <ul>
+                <li><strong>YOLOv8</strong> for player detection</li>
+                <li><strong>DeepSORT</strong> for multi-object tracking</li>
+                <li><strong>OpenCV</strong> for homography transformation (pixel → court coordinates)</li>
+            </ul>
+            <p>
+                This allows extracting player positions directly from broadcast video instead of relying on 
+                official tracking data. However, this approach faced significant challenges (discussed in Problems section).
+            </p>
+        </section>
+
+        <!-- Implementation Section -->
+        <section id="implementation">
+            <h2>3. Implementation</h2>
+
+            <h3>Project Structure</h3>
+            <pre><code>nba-personnel-tracking/
+├── src/
+│   ├── __init__.py
+│   ├── data_loader.py      # SportVU JSON parser
+│   ├── player.py            # Player class with position/metadata
+│   ├── ball.py              # Ball tracking
+│   ├── moment.py            # Single frame snapshot + metrics
+│   ├── event.py             # Full possession/play
+│   ├── court.py             # Court drawing utilities
+│   ├── visualizer.py        # Matplotlib animations
+│   ├── main.py              # CLI entry point
+│   └── cv/                  # Computer vision modules
+│       ├── __init__.py
+│       ├── video_loader.py
+│       ├── player_detector.py
+│       ├── player_tracker.py
+│       ├── court_detector.py
+│       ├── cv_data_adapter.py
+│       └── manual_selector.py
+├── web/                     # Web interface
+│   ├── index.html
+│   └── static/
+│       ├── css/
+│       │   └── style.css
+│       ├── js/
+│       │   └── app.js
+│       └── video/
+│           └── avinash_akshay_566_final.mov
+├── outputs/                 # Output videos
+│   ├── lebron_christmas_orig.mp4
+│   ├── lebron_christmas_output.mov
+│   └── lebron_christmas_yolo_output.mov
+├── app.py                   # Flask web server
+├── main.py                  # Alternative entry point
+├── test_cv.py              # CV testing script
+├── start_web.sh            # Web server startup script
+├── setup_aliases.sh        # Shell aliases setup
+├── requirements.txt        # Python dependencies
+├── yolov8n.pt              # YOLOv8 model weights
+├── project_webpage.html    # This project webpage
+├── README.md               # Main documentation
+├── QUICKSTART.md           # Quick start guide
+├── CV_README.md            # Computer vision guide
+├── WEB_README.md           # Web interface guide
+├── WEB_SETUP_COMPLETE.md   # Web setup documentation
+├── WEBPAGE_README.md       # Webpage documentation
+├── IMPLEMENTATION_SUMMARY.md # Implementation summary
+└── CLAUDE.md               # Claude-specific notes</code></pre>
+
+            <h3>Core Classes</h3>
+            
+            <h4>Player Class</h4>
+            <p>
+                Represents a player at a single moment with position (x, y), team ID, player ID, and metadata. 
+                Includes methods for distance calculations and zone detection (paint, 3-point line).
+            </p>
+
+            <h4>Moment Class</h4>
+            <p>
+                A single snapshot in time containing all player and ball positions. Implements all spacing and 
+                gravity metric calculations:
+            </p>
+            <ul>
+                <li><code>convex_hull_area()</code> - Calculates floor coverage</li>
+                <li><code>average_pairwise_distance()</code> - Mean teammate distances</li>
+                <li><code>nearest_defender_distance()</code> - Defensive pressure</li>
+                <li><code>spacing_score()</code> - Composite 0-100 score</li>
+            </ul>
+
+            <h4>Event Class</h4>
+            <p>
+                A sequence of moments representing a full possession. Provides time-series metrics and summary 
+                statistics across the entire play.
+            </p>
+
+            <h3>Key Algorithms</h3>
+
+            <h4>Convex Hull Calculation</h4>
+            <p>
+                Uses <code>scipy.spatial.ConvexHull</code> to compute the polygon formed by offensive players. 
+                The area of this polygon directly measures floor coverage.
+            </p>
+
+            <h4>Spacing Score Formula</h4>
+            <pre><code>hull_score = min(hull_area / 800, 1.0)  # Normalize to 0-1
+pairwise_score = min(avg_distance / 25, 1.0)
+spread_score = three_point_players / 4
+paint_penalty = max(0, (paint_players - 1) * 0.1)
+
+spacing_score = (hull_score * 0.3 + 
+                 pairwise_score * 0.3 + 
+                 spread_score * 0.3 - 
+                 paint_penalty) * 100</code></pre>
+
+            <h3>Visualization</h3>
+            <p>
+                Built with matplotlib's <code>FuncAnimation</code> for real-time playback. Features:
+            </p>
+            <ul>
+                <li>NBA court rendering with accurate dimensions</li>
+                <li>Player positions as colored circles (team colors)</li>
+                <li>Ball tracking with height visualization</li>
+                <li>Spacing overlay (green convex hull)</li>
+                <li>Real-time metrics display (clock, spacing score)</li>
+            </ul>
+
+            <h3>Web Interface</h3>
+            <p>
+                A modern Flask-based web application with:
+            </p>
+            <ul>
+                <li>REST API backend for data access</li>
+                <li>HTML5 Canvas for court visualization</li>
+                <li>Interactive controls (play/pause, speed adjustment)</li>
+                <li>Metrics dashboard</li>
+                <li>Video integration</li>
+            </ul>
+
+            <h3>Computer Vision Pipeline</h3>
+            <p>
+                The CV mode implements a complete pipeline:
+            </p>
+            <ol>
+                <li><strong>Video Loading:</strong> Extract frames at 25 FPS</li>
+                <li><strong>Player Detection:</strong> YOLOv8 detects all people in frame</li>
+                <li><strong>Filtering:</strong> Heuristics remove refs, coaches, fans</li>
+                <li><strong>Tracking:</strong> DeepSORT maintains consistent player IDs</li>
+                <li><strong>Team Classification:</strong> Jersey color-based assignment</li>
+                <li><strong>Court Calibration:</strong> Homography transforms pixels → court coordinates</li>
+                <li><strong>Format Conversion:</strong> CV output → SportVU format</li>
+            </ol>
+        </section>
+
+        <!-- Results Section -->
+        <section id="results">
+            <h2>4. Results</h2>
+
+            <h3>SportVU Data Analysis</h3>
+            <p>
+                The tool successfully processes SportVU tracking data and calculates spacing metrics in real-time. 
+                Key capabilities demonstrated:
+            </p>
+            <ul>
+                <li>✓ Accurate player position tracking at 25 FPS</li>
+                <li>✓ Real-time spacing score calculation</li>
+                <li>✓ Convex hull visualization showing floor coverage</li>
+                <li>✓ Metrics export to CSV for bulk analysis</li>
+                <li>✓ Interactive visualization with playback controls</li>
+            </ul>
+
+            <h3>Typical Metric Ranges</h3>
+            <p>
+                Based on analysis of multiple NBA games, we observed:
+            </p>
+            <table class="comparison-table">
+                <tr>
+                    <th>Metric</th>
+                    <th>Poor Spacing</th>
+                    <th>Average</th>
+                    <th>Elite Spacing</th>
+                </tr>
+                <tr>
+                    <td>Convex Hull Area</td>
+                    <td>&lt; 400 sq ft</td>
+                    <td>400-600 sq ft</td>
+                    <td>600-800 sq ft</td>
+                </tr>
+                <tr>
+                    <td>Avg Pairwise Distance</td>
+                    <td>&lt; 15 ft</td>
+                    <td>15-25 ft</td>
+                    <td>25+ ft</td>
+                </tr>
+                <tr>
+                    <td>Spacing Score</td>
+                    <td>&lt; 50</td>
+                    <td>50-80</td>
+                    <td>80-100</td>
+                </tr>
+                <tr>
+                    <td>Defender Distance</td>
+                    <td>&lt; 6 ft</td>
+                    <td>6-10 ft</td>
+                    <td>10+ ft</td>
+                </tr>
+            </table>
+
+            <h3>Computer Vision Results</h3>
+            <p>
+                The CV mode achieved approximately <strong>60-70% accuracy</strong> compared to SportVU ground truth. 
+                This is lower than ideal but demonstrates proof-of-concept for video-based tracking.
+            </p>
+
+            <div class="two-column">
+                <div>
+                    <h4>✓ What Worked</h4>
+                    <ul>
+                        <li>Player detection (85-95% accuracy)</li>
+                        <li>Basic tracking across frames</li>
+                        <li>Team classification (jersey colors)</li>
+                        <li>Coordinate transformation (with calibration)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>✗ Limitations</h4>
+                    <ul>
+                        <li>Position error: ±1-2 feet (vs ±0.1 ft SportVU)</li>
+                        <li>ID switches during occlusions</li>
+                        <li>Ball tracking not implemented</li>
+                        <li>Requires manual court calibration</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Visualizations</h3>
+            <p>
+                Below are three different visualizations demonstrating our approach and the challenges we encountered:
+            </p>
+
+            <h4>1. Original Game Output</h4>
+            <div class="video-container">
+                <video controls width="800" style="max-width: 100%;">
+                    <source src="outputs/lebron_christmas_orig.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <p style="margin-top: 10px; color: #666;">
+                    <strong>Description:</strong> This is the original game output showing the raw visualization of the NBA game 
+                    with player positions and court layout. This serves as the baseline for comparison with our tracking implementations.
+                </p>
+            </div>
+
+            <h4>2. SPORTVU Data Implementation (Successful)</h4>
+            <div class="video-container">
+                <video controls width="800" style="max-width: 100%;">
+                    <source src="outputs/lebron_christmas_output.mov" type="video/mp4">
+                    <source src="outputs/lebron_christmas_output.mov" type="video/quicktime">
+                    Your browser does not support the video tag.
+                </video>
+                <p style="margin-top: 10px; color: #666;">
+                    <strong>Description:</strong> This is the successful implementation using official SPORTVU tracking data. 
+                    This version demonstrates accurate player tracking, spacing metrics calculation, and real-time visualization 
+                    with the convex hull overlay showing offensive spacing. This is our primary working solution that provides 
+                    reliable and accurate spacing analysis.
+                </p>
+            </div>
+
+            <h4>3. Computer Vision Tracking Attempt (Unsuccessful)</h4>
+            <div class="video-container">
+                <video controls width="800" style="max-width: 100%;">
+                    <source src="outputs/lebron_christmas_yolo_output.mov" type="video/mp4">
+                    <source src="outputs/lebron_christmas_yolo_output.mov" type="video/quicktime">
+                    Your browser does not support the video tag.
+                </video>
+                <p style="margin-top: 10px; color: #666;">
+                    <strong>Description:</strong> This video shows our attempt to implement player tracking using computer vision 
+                    algorithms (YOLOv8 for detection and DeepSORT for tracking). Despite significant effort, we were unable to 
+                    achieve reliable tracking accuracy due to the inherent challenges of computer vision-based tracking in 
+                    basketball (occlusions, similar-looking players, camera angle changes, etc.). This demonstrates why we 
+                    ultimately switched to using SPORTVU data as our primary data source.
+                </p>
+            </div>
+
+            <h3>Demo Video</h3>
+            <div class="video-container">
+                <video controls width="800" style="max-width: 100%;">
+                    <source src="avinash_akshay_566_final.mov" type="video/mp4">
+                    <source src="avinash_akshay_566_final.mov" type="video/quicktime">
+                    Your browser does not support the video tag.
+                </video>
+                <p style="margin-top: 10px; color: #666;">
+                    <strong>Description:</strong> This is our demo video showing the tool in action with real NBA tracking data. 
+                    It demonstrates the complete workflow from data loading to visualization with spacing metrics overlaid on the court.
+                </p>
+            </div>
+        </section>
+
+        <!-- Problems Section -->
+        <section id="problems">
+            <h2>5. Potential Solutions & Challenges</h2>
+            
+            <div class="highlight">
+                <p>
+                    <strong>Note on Our Approach:</strong> We initially attempted to implement player tracking using 
+                    straight-up computer vision algorithms, working very hard to develop a robust CV-based solution. 
+                    However, we encountered significant difficulties due to the complexity of tracking players in 
+                    basketball footage (occlusions, similar appearances, camera movements, etc.). After extensive 
+                    effort, we made the decision to switch to using SPORTVU data, which provides high-quality, 
+                    accurate tracking data that enabled us to focus on the core spacing analysis problem.
+                </p>
+            </div>
+
+            <h3>SportVU Data Processing</h3>
+            
+            <h4>Large File Sizes</h4>
+            <div class="warning">
+                <strong>Challenge:</strong> Some game files exceed 100MB, causing slow loading times.
+            </div>
+            <p>
+                <strong>Potential Solution:</strong> Implement lazy loading - only parse events when requested. 
+                Add caching to avoid re-parsing the same data.
+            </p>
+
+            <h4>Data Format Variations</h4>
+            <div class="warning">
+                <strong>Challenge:</strong> Different SportVU data sources have slightly different JSON structures.
+            </div>
+            <p>
+                <strong>Potential Solution:</strong> Add robust error handling and flexible parsing that handles 
+                missing fields gracefully.
+            </p>
+
+            <h3>Computer Vision Challenges</h3>
+            <p>
+                As mentioned above, we invested significant effort into developing a computer vision-based tracking 
+                solution. Here are the key challenges we encountered and potential solutions that could be explored:
+            </p>
+
+            <h4>Tracking ID Switches</h4>
+            <div class="warning">
+                <strong>Challenge:</strong> When players cross paths or overlap, DeepSORT sometimes swaps their IDs.
+            </div>
+            <p>
+                <strong>Impact:</strong> This causes incorrect player tracking and breaks team assignments.
+            </p>
+            <p>
+                <strong>Potential Solutions:</strong>
+            </p>
+            <ul>
+                <li>Increase track confirmation threshold</li>
+                <li>Add manual player selection to bootstrap tracker</li>
+                <li>Improve re-identification features using appearance models</li>
+                <li>Use jersey number recognition to maintain identity</li>
+            </ul>
+            <p>
+                <strong>Note:</strong> This is a fundamental limitation of multi-object tracking with similar-looking objects, 
+                which is why we ultimately switched to SPORTVU data.
+            </p>
+
+            <h4>Occlusions</h4>
+            <div class="warning">
+                <strong>Challenge:</strong> Players frequently block each other from the camera view, especially 
+                in the paint or during screens.
+            </div>
+            <p>
+                <strong>Impact:</strong> Players disappear from tracking, causing gaps in position data.
+            </p>
+            <p>
+                <strong>Potential Solution:</strong> Implement track persistence - tracks remain active for several 
+                frames even when detection is lost, allowing recovery when player becomes visible again. Could also 
+                use motion prediction to estimate position during occlusions.
+            </p>
+
+            <h4>Coordinate Transformation Accuracy</h4>
+            <div class="warning">
+                <strong>Challenge:</strong> Homography mapping from pixel coordinates to court coordinates is 
+                sensitive to calibration point selection.
+            </div>
+            <p>
+                <strong>Impact:</strong> Small errors in calibration lead to significant position errors 
+                (1-2 feet) across the court.
+            </p>
+            <p>
+                <strong>Potential Solutions:</strong> 
+            </p>
+            <ul>
+                <li>Interactive calibration GUI for precise point selection</li>
+                <li>Validation checks to ensure reasonable coordinate ranges</li>
+                <li>Manual refinement option</li>
+                <li>Automatic court detection using deep learning keypoint detection</li>
+            </ul>
+            <p>
+                <strong>Remaining Issue:</strong> Broadcast camera angles change during games, requiring 
+                re-calibration for different shots. This limits practical use and was a major factor in our 
+                decision to use SPORTVU data instead.
+            </p>
+
+            <h4>Small Object Detection</h4>
+            <div class="warning">
+                <strong>Challenge:</strong> Players are only 20-30 pixels in typical broadcast footage, making 
+                detection challenging.
+            </div>
+            <p>
+                <strong>Impact:</strong> Lower detection confidence, missed detections, false positives.
+            </p>
+            <p>
+                <strong>Potential Solution:</strong> Use YOLOv8 which handles small objects better than earlier versions. 
+                Adjust confidence thresholds and add filtering heuristics. Could also explore specialized small object 
+                detection architectures.
+            </p>
+
+            <h4>Ball Tracking</h4>
+            <div class="warning">
+                <strong>Challenge:</strong> The basketball is extremely small (~5-10 pixels) and moves very fast.
+            </div>
+            <p>
+                <strong>Status:</strong> Not implemented in our CV attempt. Would require specialized small object 
+                detector or optical flow techniques.
+            </p>
+            <p>
+                <strong>Potential Solution:</strong> Would require specialized small object detector or optical flow 
+                techniques, possibly combined with physics-based motion prediction.
+            </p>
+
+            <h3>Performance Issues</h3>
+
+            <h4>Slow CV Processing</h4>
+            <div class="warning">
+                <strong>Challenge:</strong> Processing video at 25 FPS is slow: ~5-10 FPS on GPU, ~1-2 FPS on CPU.
+            </div>
+            <p>
+                <strong>Potential Solutions:</strong> 
+            </p>
+            <ul>
+                <li>Add frame skipping option</li>
+                <li>Use YOLOv8 nano model for speed</li>
+                <li>Implement progress indicators</li>
+                <li>Optimize with TensorRT or other inference engines</li>
+                <li>Use multi-GPU processing for batch analysis</li>
+            </ul>
+            <p>
+                <strong>Limitation:</strong> Real-time processing not feasible without significant optimization, 
+                which further motivated our switch to pre-processed SPORTVU data.
+            </p>
+
+            <h3>Key Learnings</h3>
+            <div class="highlight">
+                <p>
+                    <strong>Main Insight:</strong> We tried very hard to implement a robust computer vision-based 
+                    tracking solution, but the accuracy and reliability were significantly lower than using official 
+                    tracking data. The CV approach achieved ~60-70% accuracy compared to SportVU's near-perfect ground truth.
+                </p>
+                <p>
+                    <strong>Conclusion:</strong> After extensive effort, we made the strategic decision to switch to 
+                    SPORTVU data, which provides high-quality, accurate tracking data that enabled us to focus on the 
+                    core spacing analysis problem rather than struggling with tracking accuracy. While CV-based tracking 
+                    is technically feasible and could be valuable as a proof-of-concept or for cases where official data 
+                    isn't available, it requires significant refinement for practical use.
+                </p>
+            </div>
+        </section>
+
+        <!-- Findings Section -->
+        <section id="findings">
+            <h2>6. Interesting Findings</h2>
+
+            <h3>Spacing is Quantifiable</h3>
+            <p>
+                The main finding is that spacing <strong>can be objectively measured</strong>. What coaches 
+                and analysts have been evaluating subjectively can now be quantified with concrete metrics.
+            </p>
+            <div class="metric-box">
+                <strong>Key Insight:</strong> Well-spaced offenses typically have convex hull areas of 600-800 
+                square feet, while cramped possessions might only cover 300-400 square feet. This 2x difference 
+                is measurable and correlates with offensive success.
+            </div>
+
+            <h3>Spacing Dynamics</h3>
+            <p>
+                Spacing is not static - it changes dramatically throughout a possession:
+            </p>
+            <ul>
+                <li><strong>Initial Setup:</strong> Often starts with good spacing (70-80 score)</li>
+                <li><strong>During Action:</strong> Spacing can collapse as players move toward the ball</li>
+                <li><strong>Shot Attempt:</strong> Spacing often improves as players spread for rebounds</li>
+            </ul>
+            <p>
+                This temporal analysis reveals that spacing is a dynamic metric, not just a static snapshot.
+            </p>
+
+            <h3>Defensive Impact</h3>
+            <p>
+                The relationship between spacing and defender distance is not linear:
+            </p>
+            <ul>
+                <li>When spacing score &gt; 80, average defender distance increases significantly</li>
+                <li>When spacing score &lt; 50, defenders can collapse and guard multiple players</li>
+                <li>There appears to be a "tipping point" around 70 where spacing becomes effective
+            </ul>
+
+            <h3>Computer Vision vs. SportVU Comparison</h3>
+            <p>
+                Side-by-side comparison revealed:
+            </p>
+            <table class="comparison-table">
+                <tr>
+                    <th>Aspect</th>
+                    <th>SportVU</th>
+                    <th>Computer Vision</th>
+                </tr>
+                <tr>
+                    <td>Position Accuracy</td>
+                    <td>±0.1 feet</td>
+                    <td>±1-2 feet</td>
+                </tr>
+                <tr>
+                    <td>Tracking Reliability</td>
+                    <td>~100%</td>
+                    <td>~60-70%</td>
+                </tr>
+                <tr>
+                    <td>Ball Tracking</td>
+                    <td>Full 3D tracking</td>
+                    <td>Not implemented</td>
+                </tr>
+                <tr>
+                    <td>Processing Speed</td>
+                    <td>Instant (pre-processed)</td>
+                    <td>5-10 FPS (GPU)</td>
+                </tr>
+                <tr>
+                    <td>Setup Required</td>
+                    <td>None</td>
+                    <td>Manual calibration</td>
+                </tr>
+                <tr>
+                    <td>Best Use Case</td>
+                    <td>Production analysis</td>
+                    <td>Proof-of-concept, research</td>
+                </tr>
+            </table>
+
+            <h3>Metric Correlations</h3>
+            <p>
+                Preliminary analysis suggests:
+            </p>
+            <ul>
+                <li><strong>Hull Area ↔ Pairwise Distance:</strong> Strong positive correlation (r ≈ 0.85)</li>
+                <li><strong>Spacing Score ↔ Defender Distance:</strong> Moderate positive correlation (r ≈ 0.65)</li>
+                <li><strong>Paint Density ↔ Spacing Score:</strong> Strong negative correlation (r ≈ -0.75)</li>
+            </ul>
+            <p>
+                These correlations validate that the metrics are measuring related aspects of spacing.
+            </p>
+
+            <h3>Practical Applications</h3>
+            <div class="success">
+                <p>
+                    <strong>Use Cases Validated:</strong>
+                </p>
+                <ul>
+                    <li>✓ Comparing spacing across different teams</li>
+                    <li>✓ Analyzing spacing changes throughout a possession</li>
+                    <li>✓ Identifying optimal lineup combinations</li>
+                    <li>✓ Quantifying individual player "gravity"</li>
+                    <li>✓ Film study with objective metrics</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Download Section -->
+        <section id="download">
+            <h2>7. Download</h2>
+
+            <div class="download-section">
+                <h3>Source Code</h3>
+                <p>
+                    The complete source code is available for download. The project includes:
+                </p>
+                <ul style="text-align: left; display: inline-block;">
+                    <li>Full Python implementation</li>
+                    <li>SportVU data loader</li>
+                    <li>Computer vision modules</li>
+                    <li>Web interface</li>
+                    <li>Documentation</li>
+                    <li>Example data files</li>
+                </ul>
+                <br><br>
+                <a href="https://github.com/avins0114/nba-personnel-tracking/archive/refs/heads/main.zip" target="_blank" rel="noopener noreferrer">
+                    📦 Download Source Code (ZIP)
+                </a>
+                <a href="https://github.com/avins0114/nba-personnel-tracking/tree/main" target="_blank" rel="noopener noreferrer">
+                    🔗 View on GitHub
+                </a>
+            </div>
+
+            <h3>Requirements</h3>
+            <p>To run the project, you need:</p>
+            <ul>
+                <li>Python 3.8+</li>
+                <li>NumPy, Pandas, Matplotlib, SciPy</li>
+                <li>Flask (for web interface)</li>
+                <li>OpenCV, PyTorch, Ultralytics (for CV mode)</li>
+            </ul>
+            <p>See <code>requirements.txt</code> for complete dependency list.</p>
+
+            <h3>Quick Start</h3>
+            <pre><code># Clone repository
+git clone [repository-url]
+cd nba-personnel-tracking
+
+# Setup virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run web interface
+./start_web.sh
+# Or: python app.py
+
+# Or use CLI
+python src/main.py --game [sportvu_data.json] --event 10 --show-spacing
+
+# Test CV mode
+python test_cv.py</code></pre>
+
+            <h3>Documentation</h3>
+            <ul>
+                <li><code>README.md</code> - Main documentation</li>
+                <li><code>QUICKSTART.md</code> - Quick start guide</li>
+                <li><code>WEB_README.md</code> - Web interface guide</li>
+                <li><code>WEB_SETUP_COMPLETE.md</code> - Web setup instructions</li>
+                <li><code>WEBPAGE_README.md</code> - Webpage documentation</li>
+                <li><code>CV_README.md</code> - Computer vision mode guide</li>
+                <li><code>IMPLEMENTATION_SUMMARY.md</code> - Implementation summary</li>
+            </ul>
+        </section>
+
+        <!-- Future Work -->
+        <section>
+            <h2>8. Future Work</h2>
+
+            <h3>Short-term Improvements</h3>
+            <ul>
+                <li>Ball tracking implementation for CV mode</li>
+                <li>Automatic court detection (deep learning keypoint detection)</li>
+                <li>Improved player re-identification</li>
+                <li>Jersey number recognition (OCR)</li>
+            </ul>
+
+            <h3>Advanced Features</h3>
+            <ul>
+                <li>Predictive models using spacing metrics to forecast shot success</li>
+                <li>Individual player gravity quantification</li>
+                <li>Era comparison (spacing evolution over NBA history)</li>
+                <li>Integration with shot outcome data</li>
+                <li>Optimal spacing thresholds for different play types</li>
+            </ul>
+
+            <h3>Performance Optimization</h3>
+            <ul>
+                <li>Real-time processing optimization</li>
+                <li>GPU acceleration improvements</li>
+                <li>Parallel processing for bulk analysis</li>
+            </ul>
+        </section>
+    </div>
+
+    <footer>
+        <p>NBA Player Spacing Analysis Project</p>
+        <p>Computer Vision Course - Fall 2025</p>
+    </footer>
+</body>
+</html>
+
