@@ -40,6 +40,8 @@
         header p {
             font-size: 1.2em;
             opacity: 0.95;
+            text-align: center;
+            margin: 0 auto;
         }
 
         nav {
@@ -275,7 +277,7 @@
             <li><a href="#approach">Approach</a></li>
             <li><a href="#implementation">Implementation</a></li>
             <li><a href="#results">Results</a></li>
-            <li><a href="#problems">Problems</a></li>
+            <li><a href="#problems">Potential Solutions</a></li>
             <li><a href="#findings">Findings</a></li>
             <li><a href="#download">Download</a></li>
         </ul>
@@ -416,6 +418,7 @@
             <h3>Project Structure</h3>
             <pre><code>nba-personnel-tracking/
 ├── src/
+│   ├── __init__.py
 │   ├── data_loader.py      # SportVU JSON parser
 │   ├── player.py            # Player class with position/metadata
 │   ├── ball.py              # Ball tracking
@@ -425,20 +428,42 @@
 │   ├── visualizer.py        # Matplotlib animations
 │   ├── main.py              # CLI entry point
 │   └── cv/                  # Computer vision modules
+│       ├── __init__.py
 │       ├── video_loader.py
 │       ├── player_detector.py
 │       ├── player_tracker.py
 │       ├── court_detector.py
-│       └── cv_data_adapter.py
-├── data/                    # SportVU JSON files
+│       ├── cv_data_adapter.py
+│       └── manual_selector.py
 ├── web/                     # Web interface
 │   ├── index.html
 │   └── static/
 │       ├── css/
+│       │   └── style.css
 │       ├── js/
+│       │   └── app.js
 │       └── video/
+│           └── avinash_akshay_566_final.mov
+├── outputs/                 # Output videos
+│   ├── lebron_christmas_orig.mp4
+│   ├── lebron_christmas_output.mov
+│   └── lebron_christmas_yolo_output.mov
 ├── app.py                   # Flask web server
-└── requirements.txt</code></pre>
+├── main.py                  # Alternative entry point
+├── test_cv.py              # CV testing script
+├── start_web.sh            # Web server startup script
+├── setup_aliases.sh        # Shell aliases setup
+├── requirements.txt        # Python dependencies
+├── yolov8n.pt              # YOLOv8 model weights
+├── project_webpage.html    # This project webpage
+├── README.md               # Main documentation
+├── QUICKSTART.md           # Quick start guide
+├── CV_README.md            # Computer vision guide
+├── WEB_README.md           # Web interface guide
+├── WEB_SETUP_COMPLETE.md   # Web setup documentation
+├── WEBPAGE_README.md       # Webpage documentation
+├── IMPLEMENTATION_SUMMARY.md # Implementation summary
+└── CLAUDE.md               # Claude-specific notes</code></pre>
 
             <h3>Core Classes</h3>
             
@@ -606,18 +631,52 @@ spacing_score = (hull_score * 0.3 +
             </div>
 
             <h3>Visualizations</h3>
-            <div class="image-placeholder">
-                <p style="margin: 0;">[Screenshot: Court visualization with players, spacing overlay, and metrics]</p>
-                <p style="margin-top: 10px; font-size: 0.9em;">
-                    <em>To add: Take a screenshot of the visualization showing the court with all 10 players, 
-                    the ball, and a green convex hull overlay indicating offensive spacing. Real-time metrics 
-                    are displayed in the corners.</em>
+            <p>
+                Below are three different visualizations demonstrating our approach and the challenges we encountered:
+            </p>
+
+            <h4>1. Original Game Output</h4>
+            <div class="video-container">
+                <video controls width="800" style="max-width: 100%;">
+                    <source src="outputs/lebron_christmas_orig.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <p style="margin-top: 10px; color: #666;">
+                    <strong>Description:</strong> This is the original game output showing the raw visualization of the NBA game 
+                    with player positions and court layout. This serves as the baseline for comparison with our tracking implementations.
                 </p>
             </div>
-            <p style="text-align: center; color: #666; font-style: italic;">
-                The visualization shows the court with all 10 players, the ball, and a green convex hull 
-                overlay indicating offensive spacing. Real-time metrics are displayed in the corners.
-            </p>
+
+            <h4>2. SPORTVU Data Implementation (Successful)</h4>
+            <div class="video-container">
+                <video controls width="800" style="max-width: 100%;">
+                    <source src="outputs/lebron_christmas_output.mov" type="video/mp4">
+                    <source src="outputs/lebron_christmas_output.mov" type="video/quicktime">
+                    Your browser does not support the video tag.
+                </video>
+                <p style="margin-top: 10px; color: #666;">
+                    <strong>Description:</strong> This is the successful implementation using official SPORTVU tracking data. 
+                    This version demonstrates accurate player tracking, spacing metrics calculation, and real-time visualization 
+                    with the convex hull overlay showing offensive spacing. This is our primary working solution that provides 
+                    reliable and accurate spacing analysis.
+                </p>
+            </div>
+
+            <h4>3. Computer Vision Tracking Attempt (Unsuccessful)</h4>
+            <div class="video-container">
+                <video controls width="800" style="max-width: 100%;">
+                    <source src="outputs/lebron_christmas_yolo_output.mov" type="video/mp4">
+                    <source src="outputs/lebron_christmas_yolo_output.mov" type="video/quicktime">
+                    Your browser does not support the video tag.
+                </video>
+                <p style="margin-top: 10px; color: #666;">
+                    <strong>Description:</strong> This video shows our attempt to implement player tracking using computer vision 
+                    algorithms (YOLOv8 for detection and DeepSORT for tracking). Despite significant effort, we were unable to 
+                    achieve reliable tracking accuracy due to the inherent challenges of computer vision-based tracking in 
+                    basketball (occlusions, similar-looking players, camera angle changes, etc.). This demonstrates why we 
+                    ultimately switched to using SPORTVU data as our primary data source.
+                </p>
+            </div>
 
             <h3>Demo Video</h3>
             <div class="video-container">
@@ -627,74 +686,91 @@ spacing_score = (hull_score * 0.3 +
                     Your browser does not support the video tag.
                 </video>
                 <p style="margin-top: 10px; color: #666;">
-                    Demo video showing the tool in action with real NBA tracking data. 
-                    <em>(If video doesn't load, ensure the file is in the same directory as this HTML file)</em>
+                    <strong>Description:</strong> This is our demo video showing the tool in action with real NBA tracking data. 
+                    It demonstrates the complete workflow from data loading to visualization with spacing metrics overlaid on the court.
                 </p>
             </div>
         </section>
 
         <!-- Problems Section -->
         <section id="problems">
-            <h2>5. Problems Encountered</h2>
+            <h2>5. Potential Solutions & Challenges</h2>
+            
+            <div class="highlight">
+                <p>
+                    <strong>Note on Our Approach:</strong> We initially attempted to implement player tracking using 
+                    straight-up computer vision algorithms, working very hard to develop a robust CV-based solution. 
+                    However, we encountered significant difficulties due to the complexity of tracking players in 
+                    basketball footage (occlusions, similar appearances, camera movements, etc.). After extensive 
+                    effort, we made the decision to switch to using SPORTVU data, which provides high-quality, 
+                    accurate tracking data that enabled us to focus on the core spacing analysis problem.
+                </p>
+            </div>
 
             <h3>SportVU Data Processing</h3>
             
             <h4>Large File Sizes</h4>
             <div class="warning">
-                <strong>Problem:</strong> Some game files exceed 100MB, causing slow loading times.
+                <strong>Challenge:</strong> Some game files exceed 100MB, causing slow loading times.
             </div>
             <p>
-                <strong>Solution:</strong> Implemented lazy loading - only parse events when requested. 
-                Added caching to avoid re-parsing the same data.
+                <strong>Potential Solution:</strong> Implement lazy loading - only parse events when requested. 
+                Add caching to avoid re-parsing the same data.
             </p>
 
             <h4>Data Format Variations</h4>
             <div class="warning">
-                <strong>Problem:</strong> Different SportVU data sources have slightly different JSON structures.
+                <strong>Challenge:</strong> Different SportVU data sources have slightly different JSON structures.
             </div>
             <p>
-                <strong>Solution:</strong> Added robust error handling and flexible parsing that handles 
+                <strong>Potential Solution:</strong> Add robust error handling and flexible parsing that handles 
                 missing fields gracefully.
             </p>
 
             <h3>Computer Vision Challenges</h3>
+            <p>
+                As mentioned above, we invested significant effort into developing a computer vision-based tracking 
+                solution. Here are the key challenges we encountered and potential solutions that could be explored:
+            </p>
 
             <h4>Tracking ID Switches</h4>
             <div class="warning">
-                <strong>Problem:</strong> When players cross paths or overlap, DeepSORT sometimes swaps their IDs.
+                <strong>Challenge:</strong> When players cross paths or overlap, DeepSORT sometimes swaps their IDs.
             </div>
             <p>
                 <strong>Impact:</strong> This causes incorrect player tracking and breaks team assignments.
             </p>
             <p>
-                <strong>Attempted Solutions:</strong>
+                <strong>Potential Solutions:</strong>
             </p>
             <ul>
-                <li>Increased track confirmation threshold</li>
-                <li>Added manual player selection to bootstrap tracker</li>
-                <li>Improved re-identification features</li>
+                <li>Increase track confirmation threshold</li>
+                <li>Add manual player selection to bootstrap tracker</li>
+                <li>Improve re-identification features using appearance models</li>
+                <li>Use jersey number recognition to maintain identity</li>
             </ul>
             <p>
-                <strong>Result:</strong> Reduced but did not eliminate the problem. This is a fundamental 
-                limitation of multi-object tracking with similar-looking objects.
+                <strong>Note:</strong> This is a fundamental limitation of multi-object tracking with similar-looking objects, 
+                which is why we ultimately switched to SPORTVU data.
             </p>
 
             <h4>Occlusions</h4>
             <div class="warning">
-                <strong>Problem:</strong> Players frequently block each other from the camera view, especially 
+                <strong>Challenge:</strong> Players frequently block each other from the camera view, especially 
                 in the paint or during screens.
             </div>
             <p>
                 <strong>Impact:</strong> Players disappear from tracking, causing gaps in position data.
             </p>
             <p>
-                <strong>Solution:</strong> Implemented track persistence - tracks remain active for several 
-                frames even when detection is lost, allowing recovery when player becomes visible again.
+                <strong>Potential Solution:</strong> Implement track persistence - tracks remain active for several 
+                frames even when detection is lost, allowing recovery when player becomes visible again. Could also 
+                use motion prediction to estimate position during occlusions.
             </p>
 
             <h4>Coordinate Transformation Accuracy</h4>
             <div class="warning">
-                <strong>Problem:</strong> Homography mapping from pixel coordinates to court coordinates is 
+                <strong>Challenge:</strong> Homography mapping from pixel coordinates to court coordinates is 
                 sensitive to calibration point selection.
             </div>
             <p>
@@ -702,74 +778,81 @@ spacing_score = (hull_score * 0.3 +
                 (1-2 feet) across the court.
             </p>
             <p>
-                <strong>Solution:</strong> 
+                <strong>Potential Solutions:</strong> 
             </p>
             <ul>
                 <li>Interactive calibration GUI for precise point selection</li>
                 <li>Validation checks to ensure reasonable coordinate ranges</li>
                 <li>Manual refinement option</li>
+                <li>Automatic court detection using deep learning keypoint detection</li>
             </ul>
             <p>
                 <strong>Remaining Issue:</strong> Broadcast camera angles change during games, requiring 
-                re-calibration for different shots. This limits practical use.
+                re-calibration for different shots. This limits practical use and was a major factor in our 
+                decision to use SPORTVU data instead.
             </p>
 
             <h4>Small Object Detection</h4>
             <div class="warning">
-                <strong>Problem:</strong> Players are only 20-30 pixels in typical broadcast footage, making 
+                <strong>Challenge:</strong> Players are only 20-30 pixels in typical broadcast footage, making 
                 detection challenging.
             </div>
             <p>
                 <strong>Impact:</strong> Lower detection confidence, missed detections, false positives.
             </p>
             <p>
-                <strong>Solution:</strong> Used YOLOv8 which handles small objects better than earlier versions. 
-                Adjusted confidence thresholds and added filtering heuristics.
+                <strong>Potential Solution:</strong> Use YOLOv8 which handles small objects better than earlier versions. 
+                Adjust confidence thresholds and add filtering heuristics. Could also explore specialized small object 
+                detection architectures.
             </p>
 
             <h4>Ball Tracking</h4>
             <div class="warning">
-                <strong>Problem:</strong> The basketball is extremely small (~5-10 pixels) and moves very fast.
+                <strong>Challenge:</strong> The basketball is extremely small (~5-10 pixels) and moves very fast.
             </div>
             <p>
-                <strong>Status:</strong> Not implemented. Currently uses a dummy ball position at center court 
-                or follows the ball handler.
+                <strong>Status:</strong> Not implemented in our CV attempt. Would require specialized small object 
+                detector or optical flow techniques.
             </p>
             <p>
-                <strong>Future Work:</strong> Would require specialized small object detector or optical flow 
-                techniques.
+                <strong>Potential Solution:</strong> Would require specialized small object detector or optical flow 
+                techniques, possibly combined with physics-based motion prediction.
             </p>
 
             <h3>Performance Issues</h3>
 
             <h4>Slow CV Processing</h4>
             <div class="warning">
-                <strong>Problem:</strong> Processing video at 25 FPS is slow: ~5-10 FPS on GPU, ~1-2 FPS on CPU.
+                <strong>Challenge:</strong> Processing video at 25 FPS is slow: ~5-10 FPS on GPU, ~1-2 FPS on CPU.
             </div>
             <p>
-                <strong>Solution:</strong> 
+                <strong>Potential Solutions:</strong> 
             </p>
             <ul>
-                <li>Added frame skipping option</li>
-                <li>Used YOLOv8 nano model for speed</li>
-                <li>Implemented progress indicators</li>
+                <li>Add frame skipping option</li>
+                <li>Use YOLOv8 nano model for speed</li>
+                <li>Implement progress indicators</li>
+                <li>Optimize with TensorRT or other inference engines</li>
+                <li>Use multi-GPU processing for batch analysis</li>
             </ul>
             <p>
-                <strong>Limitation:</strong> Real-time processing not feasible without significant optimization.
+                <strong>Limitation:</strong> Real-time processing not feasible without significant optimization, 
+                which further motivated our switch to pre-processed SPORTVU data.
             </p>
 
             <h3>Key Learnings</h3>
             <div class="highlight">
                 <p>
-                    <strong>Main Insight:</strong> While computer vision is technically feasible, the accuracy 
-                    and reliability are significantly lower than using official tracking data. The CV approach 
-                    achieved ~60-70% accuracy compared to SportVU's near-perfect ground truth.
+                    <strong>Main Insight:</strong> We tried very hard to implement a robust computer vision-based 
+                    tracking solution, but the accuracy and reliability were significantly lower than using official 
+                    tracking data. The CV approach achieved ~60-70% accuracy compared to SportVU's near-perfect ground truth.
                 </p>
                 <p>
-                    <strong>Conclusion:</strong> For production use, using high-quality data sources (like SportVU) 
-                    is preferable to extracting from imperfect video sources. CV mode is valuable as a proof-of-concept 
-                    and for cases where official data isn't available, but requires significant refinement for 
-                    practical use.
+                    <strong>Conclusion:</strong> After extensive effort, we made the strategic decision to switch to 
+                    SPORTVU data, which provides high-quality, accurate tracking data that enabled us to focus on the 
+                    core spacing analysis problem rather than struggling with tracking accuracy. While CV-based tracking 
+                    is technically feasible and could be valuable as a proof-of-concept or for cases where official data 
+                    isn't available, it requires significant refinement for practical use.
                 </p>
             </div>
         </section>
@@ -900,10 +983,10 @@ spacing_score = (hull_score * 0.3 +
                     <li>Example data files</li>
                 </ul>
                 <br><br>
-                <a href="#" onclick="alert('Please download from GitHub repository or contact project author'); return false;">
+                <a href="https://github.com/avins0114/nba-personnel-tracking/archive/refs/heads/main.zip" target="_blank" rel="noopener noreferrer">
                     📦 Download Source Code (ZIP)
                 </a>
-                <a href="#" onclick="alert('GitHub repository link'); return false;">
+                <a href="https://github.com/avins0114/nba-personnel-tracking/tree/main" target="_blank" rel="noopener noreferrer">
                     🔗 View on GitHub
                 </a>
             </div>
@@ -932,16 +1015,23 @@ pip install -r requirements.txt
 
 # Run web interface
 ./start_web.sh
+# Or: python app.py
 
 # Or use CLI
-python src/main.py --game data/sample.json --event 10 --show-spacing</code></pre>
+python src/main.py --game [sportvu_data.json] --event 10 --show-spacing
+
+# Test CV mode
+python test_cv.py</code></pre>
 
             <h3>Documentation</h3>
             <ul>
                 <li><code>README.md</code> - Main documentation</li>
+                <li><code>QUICKSTART.md</code> - Quick start guide</li>
                 <li><code>WEB_README.md</code> - Web interface guide</li>
+                <li><code>WEB_SETUP_COMPLETE.md</code> - Web setup instructions</li>
+                <li><code>WEBPAGE_README.md</code> - Webpage documentation</li>
                 <li><code>CV_README.md</code> - Computer vision mode guide</li>
-                <li><code>PRESENTATION.md</code> - Presentation script</li>
+                <li><code>IMPLEMENTATION_SUMMARY.md</code> - Implementation summary</li>
             </ul>
         </section>
 
