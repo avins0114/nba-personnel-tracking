@@ -222,10 +222,10 @@ class CVDataAdapter:
         if len(tracked_players) == 0:
             return None
 
-        # Convert timestamp
-        timestamp = self.video_loader.get_timestamp(frame_num)
+        # Simplified time tracking - just use frame count
+        # CV tracking doesn't have real game clock information
         quarter = 1  # Default to Q1 for CV data
-        game_clock = 720.0 - timestamp  # Pretend it's a 12-minute quarter
+        game_clock = 600.0  # Fixed time for all CV frames (10 minutes)
 
         # Convert player positions to court coordinates
         players = []

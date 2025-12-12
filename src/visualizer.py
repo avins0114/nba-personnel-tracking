@@ -79,7 +79,6 @@ class GameVisualizer:
         self._player_labels = []
         self._ball_circle = None
         self._hull_patch = None
-        self._clock_text = None
         self._spacing_text = None
         self._trail_lines = []
 
@@ -161,10 +160,6 @@ class GameVisualizer:
         # Convex hull for spacing visualization
         self._hull_patch = self.ax.fill([], [], alpha=0.2, color='green', zorder=1)[0]
 
-        # Clock display
-        self._clock_text = self.ax.text(47, 52, '', fontsize=12,
-                                        ha='center', va='bottom')
-
         # Spacing score display
         self._spacing_text = self.ax.text(47, -3, '', fontsize=10,
                                           ha='center', va='top')
@@ -207,15 +202,8 @@ class GameVisualizer:
             radius = 1.2 + moment.ball.radius * 0.1
             self._ball_circle.set_radius(min(radius, 3))
 
-        # Update clock
-        quarter = moment.quarter
-        clock = moment.game_clock
-        mins = int(clock // 60)
-        secs = clock % 60
-        shot_clock = moment.shot_clock if moment.shot_clock else 0
-
-        clock_str = f"Q{quarter} | {mins}:{secs:05.2f} | Shot: {shot_clock:.1f}"
-        self._clock_text.set_text(clock_str)
+        # Clock display removed - not needed for CV tracking
+        # (SportVU data has accurate game clock, but CV tracking doesn't)
 
         # Update spacing visualization
         if self.show_spacing:
@@ -246,8 +234,7 @@ class GameVisualizer:
                 self._spacing_text.set_text('')
 
         artists = (self._player_circles + self._player_labels +
-                   [self._ball_circle, self._hull_patch,
-                    self._clock_text, self._spacing_text])
+                   [self._ball_circle, self._hull_patch, self._spacing_text])
         if self.video_image is not None:
             artists.append(self.video_image)
         return artists
